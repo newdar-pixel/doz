@@ -4,6 +4,10 @@ node_modules/
 .env.local
 .expo/
 dist/
+!apps/
+!apps/client/
+!apps/client/dist/
+!apps/client/dist/**
 web-build/
 data/db.json
 data/uploads/

@@ -79,7 +79,14 @@ export function createRestApp() {
   app.get("/api/session", (req, res) => res.json({ user: req.user }));
 
   app.get("/api/cases", asyncRoute(async (req, res) => {
-    res.json({ cases: await listCaseRecords(req.user.id) });
+    const cases = await listCaseRecords(req.user.id);
+    // Supabase case rows do not contain an embedded documentIds field. Keep the
+    // API shape consistent with the local backend so portfolio counters work.
+    const withDocumentIds = await Promise.all(cases.map(async (record) => ({
+      ...record,
+      documentIds: ((await getCaseDocuments(req.user.id, record.id)) ?? []).map((document) => document.id),
+    })));
+    res.json({ cases: withDocumentIds });
   }));
 
   app.post("/api/cases", asyncRoute(async (req, res) => {

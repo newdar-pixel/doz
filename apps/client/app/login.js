@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { BrandMark, Button, Card, Field, Page } from "../src/components";
-import { signIn, signUp } from "../src/session";
+import { resendConfirmation, signIn, signUp } from "../src/session";
 import { colors } from "../src/theme";
 
 export default function Login() {
@@ -16,6 +16,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [canResend, setCanResend] = useState(false);
 
   // Expo's static HTML can differ from React Native Web's client markup.
   // Render a stable shell first, then mount the interactive form in-browser.
@@ -23,12 +24,15 @@ export default function Login() {
 
   async function handleSignIn() {
     setMessage("");
+    setCanResend(false);
     setBusy(true);
     try {
       await signIn(email.trim(), password);
       router.replace("/(tabs)");
     } catch (error) {
-      setMessage(`Giriş yapılamadı: ${error.message}`);
+      const needsConfirmation = /email not confirmed/i.test(error.message);
+      setCanResend(needsConfirmation);
+      setMessage(needsConfirmation ? "E-posta adresiniz henüz doğrulanmadı. Aşağıdan yeni doğrulama bağlantısı isteyin." : `Giriş yapılamadı: ${error.message}`);
     } finally {
       setBusy(false);
     }
@@ -36,16 +40,33 @@ export default function Login() {
 
   async function handleSignUp() {
     setMessage("");
+    setCanResend(false);
     setBusy(true);
     try {
       const result = await signUp(email.trim(), password);
       if (result.session) {
         router.replace("/(tabs)");
       } else {
+        setCanResend(true);
         setMessage("Hesabın oluşturuldu. E-posta adresine gönderilen doğrulama bağlantısını açtıktan sonra giriş yap.");
       }
     } catch (error) {
-      setMessage(`Kayıt oluşturulamadı: ${error.message}`);
+      const mayAlreadyExist = /already registered|already exists/i.test(error.message);
+      setCanResend(mayAlreadyExist);
+      setMessage(mayAlreadyExist ? "Bu e-posta için doğrulanmayı bekleyen bir hesap var. Yeni doğrulama bağlantısı isteyebilirsiniz." : `Kayıt oluşturulamadı: ${error.message}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResendConfirmation() {
+    setMessage("");
+    setBusy(true);
+    try {
+      await resendConfirmation(email.trim());
+      setMessage("Yeni doğrulama bağlantısı e-posta adresinize gönderildi.");
+    } catch (error) {
+      setMessage(`Doğrulama e-postası gönderilemedi: ${error.message}`);
     } finally {
       setBusy(false);
     }
@@ -69,6 +90,7 @@ export default function Login() {
         <View style={styles.divider}><View style={styles.line} /><Text style={styles.or}>veya</Text><View style={styles.line} /></View>
         <Button title="Yeni hesap oluştur" variant="ghost" onPress={handleSignUp} disabled={disabled} />
         {message ? <Text style={styles.formMessage}>{message}</Text> : null}
+        {canResend ? <Button title={busy ? "Gönderiliyor…" : "Doğrulama e-postasını yeniden gönder"} variant="secondary" onPress={handleResendConfirmation} disabled={busy || !email.includes("@")} /> : null}
         <Text style={styles.note}>Devam ederek güvenli kullanım ve veri koruma ilkelerini kabul etmiş olursunuz.</Text>
         </Card>
       </View>

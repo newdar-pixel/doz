@@ -13,7 +13,21 @@ export async function signIn(email, password) {
 }
 
 export async function signUp(email, password) {
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: "https://doz-client.onrender.com" },
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function resendConfirmation(email) {
+  const { data, error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: "https://doz-client.onrender.com" },
+  });
   if (error) throw error;
   return data;
 }

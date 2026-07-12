@@ -1,6 +1,6 @@
-# Dava OS Universal
+# DOZ — Dosyadan öngörüye
 
-Dava OS; dava açıldığında dava türüne özgü öğrenme modu başlatan, gelen belgeleri işleyen, çelişki ve riskleri çıkaran, stratejiyi sürümleyen ve ChatGPT'ye MCP üzerinden bağlanabilen **web + iOS + Android** uygulama iskeletidir.
+DOZ; dava açıldığında öğrenme modu başlatan, gelen belgeleri işleyen, çelişki ve riskleri çıkaran, stratejiyi sürümleyen ve ChatGPT'ye MCP üzerinden bağlanabilen **web + iOS + Android** hukukî karar zekâsı uygulamasıdır.
 
 ## Çalışan kapsam
 
@@ -52,9 +52,9 @@ Telefon fiziksel cihazsa `EXPO_PUBLIC_API_URL` değerini bilgisayarın yerel IP 
 EXPO_PUBLIC_API_URL=http://192.168.1.25:8787
 ```
 
-## Demo giriş
+## Giriş
 
-E-posta alanına herhangi bir değer yazıp **Demo ile giriş** düğmesine bas. Demo modunda bütün kayıtlar `demo-user` hesabına yazılır.
+DOZ, Supabase Auth ile e-posta ve şifre üzerinden giriş yapar. Yerelde veya üretimde giriş yapmadan önce istemci için Supabase ortam değişkenlerini tanımlayın.
 
 ## OpenAI analizi
 

@@ -33,6 +33,20 @@ function sentenceSplit(text) {
   return text.replace(/\s+/g, " ").split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter((s) => s.length >= 20);
 }
 
+function buildRuleSummary(content, signals, documentType) {
+  const sentences = sentenceSplit(content);
+  const excerpt = sentences.slice(0, 2).join(" ").slice(0, 620);
+  const detected = [
+    signals.fileNumbers.length ? `${signals.fileNumbers.length} dosya numarası` : null,
+    signals.dates.length ? `${signals.dates.length} tarih` : null,
+    signals.articles.length ? `${signals.articles.length} mevzuat atfı` : null,
+    signals.parcels.length ? `${signals.parcels.length} taşınmaz bilgisi` : null,
+  ].filter(Boolean);
+  const prefix = `${documentType || "Belge"} için kural tabanlı ilk okuma tamamlandı.`;
+  const signalText = detected.length ? ` Tespit edilen unsurlar: ${detected.join(", ")}.` : "";
+  return `${prefix}${signalText}${excerpt ? ` Belge özeti: ${excerpt}` : " Belge metninde özet üretmeye yetecek cümle bulunamadı; asıl metni kontrol edin."}`;
+}
+
 export function findPotentialContradictions(newContent, priorDocuments = []) {
   const newSentences = sentenceSplit(newContent);
   const results = [];
@@ -60,12 +74,23 @@ export function buildDocumentAssessment({ content, documentType, priorDocuments 
   const signals = extractSignals(content);
   const researchTriggers = detectResearchTriggers(content);
   const contradictions = findPotentialContradictions(content, priorDocuments);
-  const actionItems = [];
+  const actionItems = ["Belgedeki vakıa, talep ve tarihleri asıl nüsha ile karşılaştır"];
   if (/bilirkişi/i.test(documentType) || /bilirkişi/i.test(content)) {
     actionItems.push("Bilirkişi raporuna itiraz süresini doğrula", "Ara karar sorularının tamamının cevaplanıp cevaplanmadığını kontrol et", "Hesap cetvelini matematiksel ve veri kaynağı yönünden denetle");
   }
   if (/tensip|ara karar/i.test(documentType) || /kesin süre|iki hafta|bir hafta/i.test(content)) actionItems.push("Belgedeki kesin ve kanuni süreleri takvime işle");
   if (contradictions.length) actionItems.push("Tespit edilen çelişkiler için açıklama ve karşı delil hazırla");
   if (researchTriggers.length) actionItems.push("Önerilen hukuki sorunlarda güncel lehe ve aleyhe içtihat taraması yap");
-  return { signals, researchTriggers, contradictions, actionItems: unique(actionItems), favorableFindings: [], adverseFindings: [], deadlines: [], summary: "", documentRole: "belge", confidenceNote: "Kural tabanlı ön analizdir; belge aslı ve uzman denetimiyle doğrulanmalıdır." };
+  return {
+    signals,
+    researchTriggers,
+    contradictions,
+    actionItems: unique(actionItems),
+    favorableFindings: [],
+    adverseFindings: [],
+    deadlines: [],
+    summary: buildRuleSummary(content, signals, documentType),
+    documentRole: "belge",
+    confidenceNote: "Kural tabanlı ön analizdir; belge aslı ve uzman denetimiyle doğrulanmalıdır.",
+  };
 }

@@ -28,7 +28,20 @@ const asyncRoute = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next
 async function buildDashboard(ownerId, caseId) {
   const targetCase = await getCaseRecord(ownerId, caseId);
   if (!targetCase) return null;
-  const documents = (await getCaseDocuments(ownerId, caseId)) ?? [];
+  const storedDocuments = (await getCaseDocuments(ownerId, caseId)) ?? [];
+  // Older uploads may predate the visible rule-based summary. Enrich them at
+  // read time as well, so a user does not need to upload the same file again.
+  const documents = storedDocuments.map((document) => {
+    if (document.assessment?.summary) return document;
+    return {
+      ...document,
+      assessment: buildDocumentAssessment({
+        content: document.content ?? "",
+        documentType: document.documentType ?? "Diğer",
+        priorDocuments: storedDocuments.filter((item) => item.id !== document.id),
+      }),
+    };
+  });
   const events = await getCaseEvents(ownerId, caseId);
   const contradictions = documents.flatMap((d) => d.assessment?.contradictions ?? []);
   const researchTriggers = documents.flatMap((d) => d.assessment?.researchTriggers ?? []);

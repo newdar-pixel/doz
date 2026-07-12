@@ -2,7 +2,7 @@ services:
   - type: web
     name: doz-client
     runtime: static
-    buildCommand: npm ci --legacy-peer-deps --no-audit --no-fund && npm run export:web --workspace @dava-os/client
+    buildCommand: npm install --legacy-peer-deps --no-audit --no-fund && npm run export:web --workspace @dava-os/client
     staticPublishPath: ./apps/client/dist
     autoDeploy: true
     envVars:

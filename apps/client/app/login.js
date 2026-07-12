@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { BrandMark, Button, Card, Field, Page } from "../src/components";
@@ -7,7 +7,11 @@ import { colors } from "../src/theme";
 
 export default function Login() {
   const { width } = useWindowDimensions();
-  const wide = width >= 900;
+  // Static web output is hydrated in the browser. Defer the responsive split
+  // until after hydration so the server and first browser render match.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const wide = hydrated && width >= 900;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);

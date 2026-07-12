@@ -1,6 +1,12 @@
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { extname, resolve } from "node:path";
+
+const require = createRequire(import.meta.url);
+// Import the parser implementation directly. Importing pdf-parse's package
+// entrypoint from ESM can execute its CLI debug fixture loader.
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
 export function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
@@ -48,8 +54,6 @@ export async function extractText(file) {
   const ext = extname(file.originalname).toLowerCase();
   if (file.mimetype.startsWith("text/") || [".txt", ".md", ".csv"].includes(ext)) return file.buffer.toString("utf8");
   if (file.mimetype === "application/pdf" || ext === ".pdf") {
-    const mod = await import("pdf-parse");
-    const pdfParse = mod.default ?? mod;
     const result = await pdfParse(file.buffer);
     return result.text ?? "";
   }

@@ -16,6 +16,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Expo's static HTML can differ from React Native Web's client markup.
+  // Render a stable shell first, then mount the interactive form in-browser.
+  if (!hydrated) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+
   async function handleSignIn() {
     setBusy(true);
     try {

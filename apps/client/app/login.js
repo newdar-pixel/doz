@@ -25,6 +25,10 @@ export default function Login() {
   async function handleSignIn() {
     setMessage("");
     setCanResend(false);
+    if (!email.includes("@") || password.length < 8) {
+      setMessage("Giriş için geçerli bir e-posta ve en az 8 karakterlik şifre girin.");
+      return;
+    }
     setBusy(true);
     try {
       await signIn(email.trim(), password);
@@ -41,6 +45,10 @@ export default function Login() {
   async function handleSignUp() {
     setMessage("");
     setCanResend(false);
+    if (!email.includes("@") || password.length < 8) {
+      setMessage("Hesap oluşturmak için e-posta adresinizi ve en az 8 karakterlik şifrenizi girin.");
+      return;
+    }
     setBusy(true);
     try {
       const result = await signUp(email.trim(), password);
@@ -72,7 +80,7 @@ export default function Login() {
     }
   }
 
-  const disabled = busy || !email.includes("@") || password.length < 8;
+  const disabled = busy;
   return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
     <Page style={styles.wrap}>
       <View style={[styles.shell, wide && styles.shellWide]}>

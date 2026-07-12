@@ -19,8 +19,8 @@ services:
     name: doz-api
     runtime: node
     plan: free
-    buildCommand: npm ci --legacy-peer-deps --no-audit --no-fund
-    startCommand: npm run start --workspace @dava-os/server
+    buildCommand: npm install --prefix services/server --workspaces=false --legacy-peer-deps --no-audit --no-fund
+    startCommand: node services/server/server.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:

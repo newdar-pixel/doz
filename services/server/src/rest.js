@@ -4,6 +4,7 @@ import multer from "multer";
 import { buildLearningPack } from "./learning.js";
 import { buildDocumentAssessment } from "./analyzer.js";
 import { analyzeWithAI, mergeAssessments } from "./ai.js";
+import { getUserAIConnection, getUserAIStatus, removeUserAIKey, saveUserAIKey } from "./ai-keys.js";
 import { extractText, persistUpload } from "./extract.js";
 import { resolveUser } from "./auth.js";
 import {
@@ -78,6 +79,20 @@ export function createRestApp() {
 
   app.get("/api/session", (req, res) => res.json({ user: req.user }));
 
+  app.get("/api/ai/connection", asyncRoute(async (req, res) => {
+    res.json(await getUserAIStatus(req.user.id));
+  }));
+
+  app.put("/api/ai/connection", asyncRoute(async (req, res) => {
+    await saveUserAIKey(req.user.id, req.body?.apiKey);
+    res.status(204).end();
+  }));
+
+  app.delete("/api/ai/connection", asyncRoute(async (req, res) => {
+    await removeUserAIKey(req.user.id);
+    res.status(204).end();
+  }));
+
   app.get("/api/cases", asyncRoute(async (req, res) => {
     const cases = await listCaseRecords(req.user.id);
     // Supabase case rows do not contain an embedded documentIds field. Keep the
@@ -140,11 +155,14 @@ export function createRestApp() {
     });
     let aiAssessment = null;
     try {
+      const aiConnection = await getUserAIConnection(req.user.id);
       aiAssessment = await analyzeWithAI({
         caseRecord: targetCase,
         content: extracted,
         documentType: req.body.documentType ?? "Diğer",
         ruleAssessment,
+        apiKey: aiConnection?.apiKey,
+        model: aiConnection?.model,
       });
     } catch (error) {
       console.error("AI analysis failed", error);

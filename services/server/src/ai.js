@@ -11,9 +11,9 @@ function extractJson(text) {
   return null;
 }
 
-export async function analyzeWithAI({ caseRecord, content, documentType, ruleAssessment }) {
-  if (!process.env.OPENAI_API_KEY) return null;
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export async function analyzeWithAI({ caseRecord, content, documentType, ruleAssessment, apiKey, model }) {
+  if (!apiKey) return null;
+  const client = new OpenAI({ apiKey });
   const prompt = `Sen Türk hukuku dosyalarında çalışan, kaynak uydurmayan bir dava analiz motorusun.
 Somut belgeyi sadece verilen dava bilgileri ve belge metni üzerinden analiz et. Kesin olmayan şeyi kesin yazma. İçtihat künyesi uydurma.
 
@@ -40,7 +40,7 @@ Sadece geçerli JSON üret. Şema:
   "missingEvidence": ["..."],
   "warnings": ["..."]
 }`;
-  const response = await client.responses.create({ model: process.env.OPENAI_MODEL ?? "gpt-5.6", input: prompt });
+  const response = await client.responses.create({ model: model || "gpt-5", input: prompt });
   return extractJson(response.output_text);
 }
 

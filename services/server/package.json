@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
-    "check": "node --check server.js && node --check src/store.js && node --check src/learning.js && node --check src/analyzer.js && node --check src/ai.js && node --check src/extract.js && node --check src/rest.js && node --check src/mcp.js"
+    "check": "node --check server.js && node --check src/store.js && node --check src/learning.js && node --check src/analyzer.js && node --check src/ai.js && node --check src/ai-keys.js && node --check src/extract.js && node --check src/rest.js && node --check src/mcp.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

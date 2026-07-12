@@ -21,6 +21,9 @@ export const api = {
     if (!response.ok) throw new Error(data.error || `İstek başarısız (${response.status})`);
     return data;
   }),
+  getAIConnection: () => request("/api/ai/connection"),
+  saveAIConnection: (apiKey) => request("/api/ai/connection", { method: "PUT", body: JSON.stringify({ apiKey }) }),
+  removeAIConnection: () => request("/api/ai/connection", { method: "DELETE" }),
   listCases: () => request("/api/cases"),
   createCase: (payload) => request("/api/cases", { method: "POST", body: JSON.stringify(payload) }),
   getDashboard: (id) => request(`/api/cases/${id}/dashboard`),

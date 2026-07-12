@@ -1,0 +1,20 @@
+{
+  "name": "dava-os-universal",
+  "version": "0.3.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @dava-os/server",
+    "dev:server": "npm run dev --workspace @dava-os/server",
+    "dev:client": "npm run start --workspace @dava-os/client",
+    "test": "npm run test --workspace @dava-os/server",
+    "check": "npm run check --workspace @dava-os/server",
+    "install:all": "npm install"
+  },
+  "engines": {
+    "node": "20.19.2"
+  }
+}

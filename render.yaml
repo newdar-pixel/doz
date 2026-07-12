@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: doz-client
+    runtime: static
+    buildCommand: npm ci --legacy-peer-deps --no-audit --no-fund && npm run export:web --workspace @dava-os/client
+    staticPublishPath: ./apps/client/dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.2
+      - key: EXPO_PUBLIC_API_URL
+        sync: false
+      - key: EXPO_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+
+  - type: web
+    name: doz-api
+    runtime: node
+    rootDir: services/server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: AUTH_MODE
+        value: supabase
+      - key: DATA_BACKEND
+        value: supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: MCP_API_KEY
+        generateValue: true
+      - key: MCP_OWNER_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6

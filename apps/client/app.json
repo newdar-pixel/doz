@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "DOZ",
+    "slug": "doz",
+    "version": "0.3.0",
+    "orientation": "portrait",
+    "scheme": "davaos",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/doz-mark.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-document-picker"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.davaos.app"
+    },
+    "android": {
+      "package": "com.davaos.app"
+    }
+  }
+}
